@@ -1,0 +1,17 @@
+#                          --Antoine Lee
+#                  --Sat Mar 28 2020 CST
+#            --Abs Path: $HOME/.xprofile
+
+
+# ===
+# === Mapping
+# ===
+setxkbmap -option caps:escape
+
+
+# ===
+# === Input Method
+# ===
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"

@@ -1,0 +1,43 @@
+#! /bin/bash
+
+cd ..
+for CurrentAbsPath in $(find $PWD -path "$PWD/.RUNME" -prune -o -type f -print); do
+    echo -e "\nPath: $CurrentAbsPath"
+    echo -n "Status: "
+    TargetAbsPath=$(sed -n '/Abs Path:/ s/ //g p' $CurrentAbsPath | cut -d":" -f 2)
+    if [[ $TargetAbsPath =~ '$HOME' ]]; then
+        if [[ ! -L $HOME/${TargetAbsPath#*/} ]]; then
+            ln -sf $CurrentAbsPath $HOME/${TargetAbsPath#*/}
+            echo -e "\033[40;31mNot A Link\033[0m - \033[40;34mSo Overwrite\033[0m - \033[40;33mReady\033[0m"
+        else
+            if [[ -r $HOME/${TargetAbsPath#*/} ]]; then
+                if [[ -n $(diff $CurrentAbsPath $HOME/${TargetAbsPath#*/}) ]]; then
+                    ln -sf $CurrentAbsPath $HOME/${TargetAbsPath#*/}
+                    echo -e "\033[40;31mA Wrong Link\033[0m - \033[40;34mSo Overwrite\033[0m - \033[40;33mReady\033[0m"
+                else
+                    echo -e "\033[40;33mNothing Changed\033[0m"
+                fi
+            else
+                ln -sf $CurrentAbsPath $HOME/${TargetAbsPath#*/}
+                echo -e "\033[40;31mA Broken Link\033[0m - \033[40;34mSo Overwrite\033[0m - \033[40;33mReady\033[0m"
+            fi
+        fi
+    else
+        if [[ ! -L $TargetAbsPath ]]; then
+            sudo ln -sf $CurrentAbsPath $TargetAbsPath
+            echo -e "\033[40;31mNot A Link\033[0m - \033[40;34mSo Overwrite\033[0m - \033[40;33mReady\033[0m"
+        else
+            if [[ -r $TargetAbsPath ]]; then
+                if [[ -n $(diff $CurrentAbsPath $TargetAbsPath) ]]; then
+                    sudo ln -sf $CurrentAbsPath $TargetAbsPath
+                    echo -e "\033[40;31mA Wrong Link\033[0m - \033[40;34mSo Overwrite\033[0m - \033[40;33mReady\033[0m"
+                else
+                    echo -e "\033[40;33mNothing Changed\033[0m"
+                fi
+            else
+                sudo ln -sf $CurrentAbsPath $TargetAbsPath
+                echo -e "\033[40;31mA Broken Link\033[0m - \033[40;34mSo Overwrite\033[0m - \033[40;33mReady\033[0m"
+            fi
+        fi
+    fi
+done
